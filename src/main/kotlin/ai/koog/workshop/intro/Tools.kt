@@ -9,7 +9,7 @@ data class Message(val text: String)
 
 
 @Tool
-@LLMDescription("Tool which does nothing but print a message and return user response")
+@LLMDescription("Tool which does nothing but prints a message and returns response")
 fun doNothingTool(message: Message): String {
     println(message.text)
     val response = readln()
