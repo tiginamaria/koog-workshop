@@ -1,10 +1,14 @@
 [versions]
+code-engine = "1.0.0-beta.149"
 kotlin = "2.1.10"
-koog-agents = "0.5.3"
+koog-agents = "0.5.2"
 logback = "1.5.13"
 
 [libraries]
-koog-agents = { module = "ai.koog:koog-agents", version.ref = "koog-agents"}
+grazie-executor = { module = "ai.jetbrains.code.prompt:code-prompt-executor-grazie-koog-jvm", version.ref = "code-engine" }
+grazie-models = { module = "ai.jetbrains.code.prompt:code-prompt-llm-jvm", version.ref = "code-engine" }
+
+koog-agents = { module = "ai.koog:koog-agents", version.ref = "koog-agents" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 [plugins]
