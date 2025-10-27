@@ -1,9 +1,13 @@
 package ai.koog.workshop.intro
 
 import ai.koog.prompt.dsl.prompt
+import kotlinx.io.files.Path
 
-// TODO: create prompt with system and user message, print the prompt
+// TODO: create prompt with different types of messages, print the prompt
 fun main() {
+    val resourcePath =
+        object {}.javaClass.classLoader.getResource("images")?.path ?: error("images directory not found")
+
     // Prompt is a list of messages to be sent to the llm as well as the llm parameters
     val prompt = prompt("my-prompt") {
         // System message should contain general instruction for the agent
@@ -16,6 +20,13 @@ fun main() {
         tool {
             call(id="your-tool-id", tool="Your tool name", content="Your tool content")
             result(id="your-tool-id", tool="Your tool name", content="Your tool result")
+        }
+        // You can also add attachments to the prompt
+        user{
+            +"Guess who is in the picture?"
+            attachments {
+                image(Path("$resourcePath/img.png"))
+            }
         }
     }
     prompt.messages.forEach { println(it) }

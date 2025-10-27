@@ -5,7 +5,10 @@ import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import kotlinx.coroutines.runBlocking
 
-// TODO: create a prompt executor and execute the prompt
+// TODO:
+//  1. Create a prompt executor
+//  2. Come up with system and user message and execute the prompt
+//  3. Add user message with image and ask llm what is the picture
 fun main() {
     // Create a prompt with a system and a user message
     val prompt = prompt("my-prompt") {

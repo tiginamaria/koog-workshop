@@ -21,6 +21,9 @@ fun getPrice(item: String): Int {
     return Random.nextInt(100)
 }
 
+// TODO:
+//  1. Ask llm about the price of the item and add tool get_price to the request
+//  2. Look at the structure of the llm response? How it is different from the text reply?
 fun main() {
     val token = System.getenv("OPENAI_API_KEY") ?: error("OPENAI_API_KEY is required.")
     val executor = simpleOpenAIExecutor(token)

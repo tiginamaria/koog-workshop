@@ -41,7 +41,6 @@ class Shop : ToolSet {
 //  1. Annotate `addToCart` with @Tool and @LLMDescription
 //  2. Make sure all tools are in the shop tool set
 //  3. Add tools to executor and ask the price of the item and add it to the cart
-
 fun main() {
     val shop = Shop()
     shop.asTools().forEach {
