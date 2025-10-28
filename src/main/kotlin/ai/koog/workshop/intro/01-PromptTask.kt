@@ -20,12 +20,12 @@ fun main() {
         // Except from system and user messages, prompt can also contain assistant, tool call or tool result messages
         assistant("Your assistant message")
         tool {
-            call(id="your-tool-id", tool="Your tool name", content="Your tool content")
-            result(id="your-tool-id", tool="Your tool name", content="Your tool result")
+            call(id = "your-tool-id", tool = "Your tool name", content = "Your tool content")
+            result(id = "your-tool-id", tool = "Your tool name", content = "Your tool result")
         }
         // You can also add attachments to the prompt
-        user{
-            +"Guess who is in the picture?"
+        user {
+            +"Guess what is in the picture?"
             attachments {
                 image(Path("$resourcePath/img.png"))
             }

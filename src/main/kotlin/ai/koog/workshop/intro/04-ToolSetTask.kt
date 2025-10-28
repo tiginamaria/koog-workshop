@@ -24,12 +24,14 @@ class Shop : ToolSet {
     /**
      * Adds an item to the cart, returns a message if the item has been added or already exists in the cart
      */
+    @Tool("add_to_cart")
+    @LLMDescription("Add an item to the cart.")
     fun addToCart(item: String): String {
         logger.info { "Adding `$item` to cart" }
         if (cart.add(item)) {
-            return "Item $item has been added to your cart."
+            return "Item `$item` has been added to your cart."
         }
-        return "Item $item is already in your cart."
+        return "Item `$item` is already in your cart."
     }
 
     /**
@@ -39,12 +41,14 @@ class Shop : ToolSet {
     @LLMDescription("Get the price of an item.")
     fun getPrice(item: String): Int {
         logger.info { "Get price of `$item`" }
-        return Random.nextInt(100)
+        val price = Random.nextInt(100)
+        logger.info { "The price of `$item` is `$price`" }
+        return price
     }
 }
 
 // TODO:
-//  1. Annotate `addToCart` with @Tool and @LLMDescription
+//  1. Annotate `addToCart`and `getPrice` with @Tool and @LLMDescription
 //  2. Make sure all tools are in the shop tool set
 //  3. Add tools to executor and ask the price of the item and add it to the cart
 fun main() {
