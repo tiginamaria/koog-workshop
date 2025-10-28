@@ -7,6 +7,7 @@ import ai.koog.agents.core.tools.reflect.asTools
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
@@ -14,6 +15,9 @@ import kotlin.random.Random
  * [ToolSet] in the way to group tools
  */
 class Shop : ToolSet {
+
+    private val logger = KotlinLogging.logger {}
+
     /** The cart is a set of items */
     val cart = mutableSetOf<String>()
 
@@ -21,6 +25,7 @@ class Shop : ToolSet {
      * Adds an item to the cart, returns a message if the item has been added or already exists in the cart
      */
     fun addToCart(item: String): String {
+        logger.info { "Adding `$item` to cart" }
         if (cart.add(item)) {
             return "Item $item has been added to your cart."
         }
@@ -33,6 +38,7 @@ class Shop : ToolSet {
     @Tool("get_price")
     @LLMDescription("Get the price of an item.")
     fun getPrice(item: String): Int {
+        logger.info { "Get price of `$item`" }
         return Random.nextInt(100)
     }
 }

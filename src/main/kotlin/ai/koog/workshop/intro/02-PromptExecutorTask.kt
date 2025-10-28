@@ -9,6 +9,8 @@ import kotlinx.coroutines.runBlocking
 //  1. Create a prompt executor
 //  2. Come up with system and user message and execute the prompt
 //  3. Add user message with image and ask llm what is the picture
+//  4.* Make executor to work both with OpenAI and Ollama using [MultiLLMPromptExecutor]
+//      Configure using map from [LLMProvider] to [LLMClient]
 fun main() {
     // Create a prompt with a system and a user message
     val prompt = prompt("my-prompt") {

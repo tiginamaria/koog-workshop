@@ -3,7 +3,9 @@ package ai.koog.workshop.intro
 import ai.koog.prompt.dsl.prompt
 import kotlinx.io.files.Path
 
-// TODO: create prompt with different types of messages, print the prompt
+// TODO:
+//  1. Create prompt with different types of messages
+//  2. Print the prompt, make sure all the defined messages are there
 fun main() {
     val resourcePath =
         object {}.javaClass.classLoader.getResource("images")?.path ?: error("images directory not found")
