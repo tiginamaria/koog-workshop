@@ -5,7 +5,11 @@ import ai.koog.agents.core.tools.annotations.Tool
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Message(val text: String)
+@LLMDescription("Message from the llm to communicate with the user")
+data class Message(
+    @property:LLMDescription("Message text to be printed")
+    val text: String
+)
 
 
 @Tool
