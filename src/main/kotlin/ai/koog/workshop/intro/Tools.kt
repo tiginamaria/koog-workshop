@@ -11,7 +11,8 @@ data class Message(val text: String)
 @Tool
 @LLMDescription("Tool which does nothing but prints a message and returns response")
 fun doNothingTool(message: Message): String {
-    println(message.text)
+    println("Here is your message:\n${message.text}")
+    println("Type your response:")
     val response = readln()
     return response
 }

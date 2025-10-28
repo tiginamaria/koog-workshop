@@ -15,11 +15,11 @@ fun main() {
     runBlocking {
         val agent = AIAgent(
             toolRegistry = ToolRegistry {
-                // TODO: add tools
+                // TODO: add more tools
                 tool(::doNothingTool.asTool())
             },
-            strategy = strategy("my-strategy") {
-                // TODO: implement strategy
+            // TODO: implement your custom strategy or use singleRunStrategy
+            strategy = strategy("my-first-strategy") {
                 val myNode by node<String, String> { input ->
                     input
                 }
@@ -27,8 +27,8 @@ fun main() {
                 edge(myNode forwardTo nodeFinish)
             },
             agentConfig = AIAgentConfig(
-                // TODO: modify system prompt
-                prompt = prompt("System") {
+                // TODO: set your system prompt
+                prompt = prompt("my-first-agent") {
                     system("System prompt")
                 },
                 model = OpenAIModels.Chat.GPT4o,
@@ -37,7 +37,8 @@ fun main() {
             promptExecutor = simpleOpenAIExecutor(System.getenv("OPENAI_API_KEY"))
         )
 
-        // TODO: modify user prompt
+        // TODO: set your user prompt
         val result = agent.run("User prompt")
+        println(result)
     }
 }
