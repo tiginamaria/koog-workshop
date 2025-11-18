@@ -9,7 +9,6 @@ import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
-import kotlin.random.Random
 
 /**
  * [ToolSet] in the way to group tools
@@ -24,9 +23,9 @@ class Shop : ToolSet {
     /**
      * Adds an item to the cart, returns a message if the item has been added or already exists in the cart
      */
-    @Tool("add_to_cart")
-    @LLMDescription("Add an item to the cart.")
-    fun addToCart(item: String): String {
+    fun addToCart(
+        item: String
+    ): String {
         logger.info { "Adding `$item` to cart" }
         if (cart.add(item)) {
             return "Item `$item` has been added to your cart."
@@ -35,23 +34,34 @@ class Shop : ToolSet {
     }
 
     /**
-     * Gets the price of an item (mocked, returns a random number)
+     * Gets the price of an item (mocked, price is always 100)
      */
     @Tool("get_price")
     @LLMDescription("Get the price of an item.")
-    fun getPrice(item: String): Int {
-        logger.info { "Get price of `$item`" }
-        val price = Random.nextInt(100)
+    fun getPrice(
+        @LLMDescription("The item name to get the price of.")
+        item: String,
+        @LLMDescription("The discount percentage. Default is 0")
+        discount: Int = 0
+    ): Int {
+        logger.info { "Get price of `$item` with discount `$discount`" }
+        val price = 100 * (100 - discount) / 100
         logger.info { "The price of `$item` is `$price`" }
         return price
     }
 }
 
 // TODO:
-//  1. Annotate `addToCart`and `getPrice` with @Tool and @LLMDescription
+//  1. Annotate `addToCart` tool with @Tool and @LLMDescription
 //  2. Make sure all tools are in the shop tool set
-//  3. Add tools to executor and ask the price of the item and add it to the cart
+//  3. Add tools to executor
+//  4. Ask llm about the price of the item
+//  5. Ask llm about the price of the item and add it to the cart, allow parallel tool calls
+//  6. Mention the discount
 fun main() {
+    val token = System.getenv("OPENAI_API_KEY") ?: error("OPENAI_API_KEY is required.")
+    val executor = simpleOpenAIExecutor(token)
+
     val shop = Shop()
     shop.asTools().forEach {
         println("Tool name: ${it.name}")
@@ -59,8 +69,6 @@ fun main() {
         println("Tool description: ${it.descriptor}")
     }
 
-    val token = System.getenv("OPENAI_API_KEY") ?: error("OPENAI_API_KEY is required.")
-    val executor = simpleOpenAIExecutor(token)
     val prompt = prompt("shop-prompt") {
         system("You are a helpful shopping assistant")
         // Add a user message

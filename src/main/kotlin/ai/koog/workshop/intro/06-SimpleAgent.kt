@@ -8,6 +8,7 @@ import ai.koog.agents.core.tools.reflect.asTools
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
+import ai.koog.workshop.intro.utils.installDefaultEventHandler
 import kotlinx.coroutines.runBlocking
 
 // TODO:
@@ -18,7 +19,6 @@ import kotlinx.coroutines.runBlocking
 //  5. Run the agent asking something complex or not relevant to the shop, print the result
 fun main() {
     val token = System.getenv("OPENAI_API_KEY") ?: error("OPENAI_API_KEY is required.")
-
     val shop = Shop()
 
     val agent = AIAgent(
@@ -33,16 +33,19 @@ fun main() {
                 system("You are a helpful shopping assistant")
             },
             // Model to use for the agent, should match one of the models supported by the llm provider in prompt executor
-            model = OpenAIModels.Chat.GPT4o,
+            model = OpenAIModels.Chat.GPT4_1,
             // Max number of agent steps to execute before force stop
             maxAgentIterations = 10,
         ),
+        // The logic of the agent
         strategy = singleRunStrategy(),
-    )
+    ) {
+        installDefaultEventHandler()
+    }
 
     val result = runBlocking {
         // Send your question to the agent
-        agent.run("Add apple and banana to cart")
+        agent.run("What is the price of the banana?")
     }
     println(result)
 

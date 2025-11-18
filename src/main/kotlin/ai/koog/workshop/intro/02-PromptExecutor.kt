@@ -1,8 +1,8 @@
 package ai.koog.workshop.intro
 
-import ai.jetbrains.code.prompt.llm.JetBrainsAIModels
 import ai.koog.prompt.dsl.prompt
-import ai.koog.workshop.intro.utils.simpleGraziePromptExecutor
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import kotlinx.coroutines.runBlocking
 
 // TODO:
@@ -18,16 +18,16 @@ fun main() {
     prompt.messages.forEach { println(it) }
 
     // Most of the providers require an api token to be used
-    val token = System.getenv("GRAZIE_TOKEN") ?: error("GRAZIE_TOKEN is required.")
+    val token = System.getenv("OPENAI_API_KEY") ?: error("OPENAI_API_KEY is required.")
 
     // Executor is the wrapper around the llm provider, it sends the prompt to the llm and returns the result
-    val executor = simpleGraziePromptExecutor(token)
+    val executor = simpleOpenAIExecutor(token)
 
     // The llm execution is asynchronous, so we need to run it in a coroutine
     runBlocking {
         val result = executor.execute(
             prompt = prompt,
-            model = JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI,
+            model = OpenAIModels.Chat.GPT4_1,
             tools = emptyList()
         )
 

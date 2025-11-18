@@ -1,11 +1,11 @@
 package ai.koog.workshop.intro
 
-import ai.jetbrains.code.prompt.llm.JetBrainsAIModels
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.asTool
 import ai.koog.prompt.dsl.prompt
-import ai.koog.workshop.intro.utils.simpleGraziePromptExecutor
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
@@ -30,8 +30,8 @@ fun getPrice(
 //  2. Look at the structure of the llm response? How it is different from the text reply?
 //  3. Add discount argument to the getPrice tool with default value. How tool descriptor will change?
 fun main() {
-    val token = System.getenv("GRAZIE_TOKEN") ?: error("GRAZIE_TOKEN is required.")
-    val executor = simpleGraziePromptExecutor(token)
+    val token = System.getenv("OPENAI_API_KEY") ?: error("OPENAI_API_KEY is required.")
+    val executor = simpleOpenAIExecutor(token)
 
     val prompt = prompt("shop-prompt") {
         system("You are a helpful shopping assistant")
@@ -50,7 +50,7 @@ fun main() {
     runBlocking {
         val result = executor.execute(
             prompt = prompt,
-            model = JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI,
+            model = OpenAIModels.Chat.GPT4_1,
             tools = listOf(tool.descriptor)
         )
 

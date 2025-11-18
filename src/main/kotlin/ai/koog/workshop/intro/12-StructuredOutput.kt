@@ -1,10 +1,10 @@
 package ai.koog.workshop.intro
 
-import ai.jetbrains.code.prompt.llm.JetBrainsAIModels
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.prompt.dsl.prompt
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import ai.koog.prompt.structure.executeStructured
-import ai.koog.workshop.intro.utils.simpleGraziePromptExecutor
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
@@ -14,7 +14,7 @@ data class Recipe(
     @param:LLMDescription("The name of the dish")
     val dish: String,
     @param:LLMDescription("List of ingredients required for the dish")
-    val ingredients: List<String>,
+    val ingredients: List<String> = emptyList(),
     @param:LLMDescription("The instructions for preparing the dish")
     val instructions: String,
 )
@@ -23,8 +23,8 @@ data class Recipe(
 //  1. Set your system and user message, ask to generate a recipe for a dish
 //  2. Create [Ingredient] data class with name and amount
 fun main() {
-    val token = System.getenv("GRAZIE_TOKEN") ?: error("GRAZIE_TOKEN is required.")
-    val executor = simpleGraziePromptExecutor(token)
+    val token = System.getenv("OPENAI_API_KEY") ?: error("OPENAI_API_KEY is required.")
+    val executor = simpleOpenAIExecutor(token)
 
     // Create a prompt with a system and a user message
     val prompt = prompt("my-prompt") {
@@ -36,7 +36,7 @@ fun main() {
     runBlocking {
         val result = executor.executeStructured<Recipe>(
             prompt = prompt,
-            model = JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI,
+            model = OpenAIModels.Chat.GPT4_1,
             examples = listOf(
                 Recipe(
                     dish = "pancakes",
