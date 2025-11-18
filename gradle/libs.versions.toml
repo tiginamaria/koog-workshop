@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.1.10"
-koog-agents = "0.5.3"
+koog-agents = "0.5.4-develop-20251118-0203"
 logback = "1.5.13"
 
 [libraries]
