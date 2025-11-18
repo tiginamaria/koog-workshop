@@ -12,8 +12,8 @@ import kotlinx.coroutines.runBlocking
 fun main() {
     // Create a prompt with a system and a user message
     val prompt = prompt("my-prompt") {
-        system("Your system message")
-        user("Your user message")
+        system("You are a helpful assistant")
+        user("How to get from Ams to Munich")
     }
     prompt.messages.forEach { println(it) }
 

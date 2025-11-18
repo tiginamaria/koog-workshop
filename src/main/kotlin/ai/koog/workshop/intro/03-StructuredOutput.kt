@@ -8,13 +8,22 @@ import ai.koog.workshop.intro.utils.simpleGraziePromptExecutor
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
+@LLMDescription("An ingredient with name and amount")
+@Serializable
+data class Ingredient(
+    @param:LLMDescription("The name of the ingredient")
+    val name: String,
+    @param:LLMDescription("The amount of the ingredient")
+    val amount: String
+)
+
 @LLMDescription("The recipe for fo the dish")
 @Serializable
 data class Recipe(
     @param:LLMDescription("The name of the dish")
     val dish: String,
     @param:LLMDescription("List of ingredients required for the dish")
-    val ingredients: List<String>,
+    val ingredients: List<Ingredient>,
     @param:LLMDescription("The instructions for preparing the dish")
     val instructions: String,
 )
@@ -40,7 +49,11 @@ fun main() {
             examples = listOf(
                 Recipe(
                     dish = "pancakes",
-                    ingredients = listOf("egg", "milk", "flour"),
+                    ingredients = listOf(
+                        Ingredient("flour", "1 cup"),
+                        Ingredient("eggs", "2"),
+                        Ingredient("milk", "1 cup"),
+                    ),
                     instructions = "Mix all ingredients and cook"
                 )
             )

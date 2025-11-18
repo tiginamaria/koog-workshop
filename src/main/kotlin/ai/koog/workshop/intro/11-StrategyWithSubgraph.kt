@@ -3,15 +3,14 @@ package ai.koog.workshop.intro
 import ai.jetbrains.code.prompt.llm.JetBrainsAIModels
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.agent.config.AIAgentConfig
+import ai.koog.agents.core.agent.context.agentInput
+import ai.koog.agents.core.agent.entity.AIAgentStorageKey
+import ai.koog.agents.core.agent.entity.ToolSelectionStrategy
 import ai.koog.agents.core.dsl.builder.forwardTo
 import ai.koog.agents.core.dsl.builder.strategy
-import ai.koog.agents.core.dsl.extension.nodeExecuteTool
-import ai.koog.agents.core.dsl.extension.nodeLLMRequest
-import ai.koog.agents.core.dsl.extension.nodeLLMSendToolResult
-import ai.koog.agents.core.dsl.extension.onAssistantMessage
-import ai.koog.agents.core.dsl.extension.onToolCall
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.core.tools.reflect.asTools
+import ai.koog.agents.ext.agent.subgraphWithTask
 import ai.koog.prompt.dsl.prompt
 import ai.koog.workshop.intro.utils.installDefaultEventHandler
 import ai.koog.workshop.intro.utils.simpleGraziePromptExecutor
@@ -32,23 +31,58 @@ fun main() {
                 system("You are a helpful cooking assistant")
             },
             model = JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI,
-            maxAgentIterations = 10,
+            maxAgentIterations = 100,
         ),
         strategy = strategy<Order, String>("strategy-name") {
-            val nodePrompt by node<Order, String> {
-                "Order all ingredients to cook ${it.dish} for ${it.guests} guests with ${it.allergies.ifEmpty { "no" }} allergies?"
+            // First subgraph
+            val subgraphPrice by subgraphWithTask<Order, Unit>(toolSelectionStrategy = ToolSelectionStrategy.ALL) { order ->
+                "Order all ingredients to cook ${order.dish} for ${order.guests} guests with ${order.allergies.ifEmpty { "no" }} allergies?" +
+                        "Ask the price of all ingredients"
             }
-            val nodeLLMRequest by nodeLLMRequest()
-            val nodeExecuteTool by nodeExecuteTool()
-            val nodeSendToolResult by nodeLLMSendToolResult()
 
-            edge(nodeStart forwardTo nodePrompt)
-            edge(nodePrompt forwardTo nodeLLMRequest)
-            edge(nodeLLMRequest forwardTo nodeExecuteTool onToolCall { true })
-            edge(nodeExecuteTool forwardTo nodeSendToolResult)
-            edge(nodeSendToolResult forwardTo nodeExecuteTool onToolCall { true })
-            edge(nodeSendToolResult forwardTo nodeFinish onAssistantMessage { true })
-            edge(nodeLLMRequest forwardTo nodeFinish onAssistantMessage { true })
+            // Second subgraph
+            val subgraphAdd by subgraphWithTask<Unit, Unit>(toolSelectionStrategy = ToolSelectionStrategy.ALL) { order ->
+                "Add all ingredients to the shopping cart."
+            }
+
+            edge(nodeStart forwardTo subgraphPrice)
+            edge(subgraphPrice forwardTo subgraphAdd)
+            edge(subgraphAdd forwardTo nodeFinish transformed { "" })
+
+            // Example of how to clean / modify the prompt
+            val nodeRewritePrompt by node<Unit, Unit> {
+                llm.writeSession {
+                    rewritePrompt { oldPrompt ->
+                        prompt("new-prompt") {
+                            oldPrompt.messages.take(5)
+                        }
+                    }
+                }
+            }
+
+            // Example of how to get agent intput from any node inside the graph
+            val nodeGetAgentInput by node<Unit, Unit> {
+                val input: Order = agentInput<Order>()
+            }
+
+            // Storage key
+            val key = AIAgentStorageKey<Recipe>("recipe")
+
+            // Node to put value to storage
+            val nodePutToStorage by node<Unit, Unit> {
+                storage.set(
+                    key, Recipe(
+                        dish = "omlet",
+                        ingredients = listOf(Ingredient("egg", "1")),
+                        instructions = "Mix all"
+                    )
+                )
+            }
+
+            // Node to get value from storage
+            val nodeGetFromStorage by node<Unit, Unit> {
+                val recipe = storage.get(key)
+            }
         }
     ) {
         // Same as in SimpleAgent

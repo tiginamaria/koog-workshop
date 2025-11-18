@@ -21,8 +21,10 @@ fun getPrice(
     // Description of the tool argument, it will be used by the LLM to know what arguments to provide
     @LLMDescription("The item name to get the price of.")
     item: String,
+    @LLMDescription("The discount percentage. Default is 0")
+    discount: Int = 0
 ): Int {
-    return Random.nextInt(100)
+    return Random.nextInt(100) * (100 - discount) / 100
 }
 
 // TODO:
@@ -36,7 +38,7 @@ fun main() {
     val prompt = prompt("shop-prompt") {
         system("You are a helpful shopping assistant")
         // Add a user message
-        user("Your question to shopping assistant")
+        user("What is the price of a laptop? We have 50% discount")
     }
 
     val tool = ::getPrice.asTool()

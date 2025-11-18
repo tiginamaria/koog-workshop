@@ -23,7 +23,10 @@ class Shop : ToolSet {
     /**
      * Adds an item to the cart, returns a message if the item has been added or already exists in the cart
      */
+    @Tool("add_to_cart")
+    @LLMDescription("Add an item to the cart.")
     fun addToCart(
+        @LLMDescription("The item to add to the cart.")
         item: String
     ): String {
         logger.info { "Adding `$item` to cart" }
@@ -72,7 +75,7 @@ fun main() {
     val prompt = prompt("shop-prompt") {
         system("You are a helpful shopping assistant")
         // Add a user message
-        user("Your question to shopping assistant")
+        user("Get price of the laptop and add it to the cart")
     }
 
     runBlocking {

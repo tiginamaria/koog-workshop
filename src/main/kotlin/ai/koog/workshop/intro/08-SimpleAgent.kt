@@ -67,7 +67,7 @@ fun main() {
 
     val result = runBlocking {
         // Send your question to the agent
-        agent.run("What is the price of the banana?")
+        agent.run("What is the price of the banana? Add it to the cart.")
     }
     println(result)
 

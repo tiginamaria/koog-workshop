@@ -7,6 +7,7 @@ import ai.koog.agents.core.dsl.builder.forwardTo
 import ai.koog.agents.core.dsl.builder.strategy
 import ai.koog.agents.core.dsl.extension.*
 import ai.koog.agents.core.tools.ToolRegistry
+import ai.koog.agents.core.tools.reflect.asTool
 import ai.koog.agents.core.tools.reflect.asTools
 import ai.koog.prompt.dsl.prompt
 import ai.koog.workshop.intro.utils.installDefaultEventHandler
@@ -21,24 +22,31 @@ fun main() {
     val agent = AIAgent(
         promptExecutor = simpleGraziePromptExecutor(token),
         toolRegistry = ToolRegistry {
-            tools(shop.asTools())
+            tool(shop::addToCart.asTool())
         },
         agentConfig = AIAgentConfig(
             prompt = prompt("shop-prompt") {
                 system("You are a helpful cooking assistant")
             },
             model = JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI,
-            maxAgentIterations = 10,
+            maxAgentIterations = 100,
         ),
         strategy = strategy<Order, String>("strategy-name") {
             val nodePrompt by node<Order, String> {
-                "Which ingredients are required to cook ${it.dish} for ${it.guests} guests with ${it.allergies.ifEmpty { "no" }} allergies?"
+                "Which ingredients are required to cook ${it.dish} for ${it.guests} guests with ${it.allergies.ifEmpty { "no" }} allergies?. " +
+                        "Add all ingredients to the shopping cart."
             }
             val nodeRequestLLM by nodeLLMRequest()
+            val nodeExecuteTool by nodeExecuteTool()
+            val nodeSendToolResult by nodeLLMSendToolResult()
 
             edge(nodeStart forwardTo nodePrompt)
             edge(nodePrompt forwardTo nodeRequestLLM)
             edge(nodeRequestLLM forwardTo nodeFinish onAssistantMessage { true })
+            edge(nodeRequestLLM forwardTo nodeExecuteTool onToolCall { true })
+            edge(nodeExecuteTool forwardTo nodeSendToolResult)
+            edge(nodeSendToolResult forwardTo nodeExecuteTool onToolCall { true })
+            edge(nodeSendToolResult forwardTo nodeFinish onAssistantMessage { true })
         },
     ) {
         // Same as in SimpleAgent

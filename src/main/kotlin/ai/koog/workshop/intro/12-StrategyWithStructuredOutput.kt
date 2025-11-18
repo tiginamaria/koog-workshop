@@ -30,8 +30,8 @@ fun main() {
             model = JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI,
             maxAgentIterations = 100,
         ),
-        strategy = strategy<Order, Unit>("strategy-name") {
-            val orderSubgraph by subgraphWithTask<Order, Unit>(
+        strategy = strategy<Order, Recipe>("strategy-name") {
+            val orderSubgraph by subgraphWithTask<Order, Recipe>(
                 toolSelectionStrategy = ToolSelectionStrategy.ALL,
             ) {
                 "Order all ingredients to cook ${it.dish} for ${it.guests} guests with ${it.allergies.ifEmpty { "no" }} allergies?"
