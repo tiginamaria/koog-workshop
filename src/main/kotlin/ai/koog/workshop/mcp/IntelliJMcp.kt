@@ -29,11 +29,16 @@ class IntelliJMcp {
 
     suspend fun createToolRegistry(): ToolRegistry {
         println("Creating IntelliJ MCP tool registry...")
-//        runIntelliJMcpProxyProcess()
-
-        return McpToolRegistryProvider.fromTransport(
+        val toolRegistry = McpToolRegistryProvider.fromTransport(
             transport = McpToolRegistryProvider.defaultSseTransport(IJ_MCP_SERVER_URL, retriableClient)
         )
+
+        println("IntelliJ available tools: ")
+        toolRegistry.tools.forEachIndexed { index, tool ->
+            println("#$index: '${tool.name}'")
+        }
+
+        return toolRegistry
     }
 
     //region Private Methods
